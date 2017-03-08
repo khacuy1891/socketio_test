@@ -1,0 +1,15 @@
+{
+  "name": "tienlen",
+  "version": "0.0.0",
+  "description": "A simple chat client using socket.io",
+  "main": "socket_server.js",
+  "author": "NKU",
+  "private": true,
+  "license": "BSD",
+  "dependencies": {
+    "express": "4.13.4"
+  },
+  "scripts": {
+    "start": "node socket_server.js"
+  }
+}
