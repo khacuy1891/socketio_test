@@ -1,11 +1,11 @@
 var http = require('http');
 var	socketIO = require('socket.io');
 var	port = process.env.PORT || 8080;
-var	ip = process.env.IP || '192.168.1.7';
+//var	ip = process.env.IP || '192.168.1.5';
 var count_client = 0;
 
-server = http.createServer().listen(port, ip, function(){
-	console.log('Socket.IO server started at %s:%s!', ip, port);
+server = http.createServer().listen(port, function(){
+	console.log('Socket.IO server started at %s:%s!', port);
 }),
 
 /* server = http.createServer().listen(port, function(){
