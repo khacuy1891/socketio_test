@@ -1,15 +1,15 @@
 $(document).ready(function(){
 	//var socket = io.connect('http://192.168.1.7:8080/');
-	var socket = io.connect('https://tienlen.herokuapp.com');
+	var socket = io.connect('https://tienlen.herokuapp.com/');
 	
 	socket.on('create_table', function(data){
 		//alert(data);
-		$('p').text(data.player_id);
+		$('#hw1').text(data.player_id);
 	})
 	
 	socket.on('server_sent', function(data){
 		//alert(data);
-		$('p').text(data);
+		$('#hw2').text(data);
 	})
 
 	$('#go').click(function(){
