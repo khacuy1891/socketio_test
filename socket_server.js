@@ -35,6 +35,7 @@ var run = function(socket){
 		//var table_id = Math.floor((Math.random() * 10) + 1);
 		// Send data to client
 		socket.emit('create_table', JSON.parse(data));
+		socket.broadcast.emit('create_table', JSON.parse(data));
 	})
 	
 	// Receive data from client
@@ -42,7 +43,7 @@ var run = function(socket){
 		// Send data to client
 		console.log('client_sent: ' + data);
 		socket.broadcast.emit('server_sent', data);
-		//socket.emit('server_sent', data);
+		socket.emit('server_sent', data);
 	})
 	
 	// Receive data from client
