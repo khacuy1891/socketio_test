@@ -29,6 +29,13 @@ var run = function(socket){
 	})
 	
 	// Receive data from client
+	socket.on('client_sent', function(data){
+		// Send data to client
+		console.log('client_sent: ' + data);
+		socket.broadcast.emit('server_sent', data);
+	})
+	
+	// Receive data from client
 	socket.on('user', function(data){
 		var address = socket.handshake.address;
 		console.log('New connection from ' + address.address + ':' + address.port);
