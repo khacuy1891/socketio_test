@@ -5,7 +5,7 @@ var	port = process.env.PORT || 8080;
 var count_client = 0;
 
 server = http.createServer().listen(port, function(){
-	console.log('Socket.IO server started at %s:%s!', port);
+	console.log('Socket.IO server started at: %s!', port);
 }),
 
 /* server = http.createServer().listen(port, function(){
@@ -18,7 +18,7 @@ io.set('origins', '*:*');
 	
 var run = function(socket){
 	count_client++;
-	console.log('Server connected to client: ' + count_client);
+	console.log('%s. Client %s connected to server!', count_client, socket.id);
 	
 	// Receive data from client
 	socket.on('create_table', function(data){

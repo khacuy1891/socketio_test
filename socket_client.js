@@ -1,8 +1,8 @@
 $(document).ready(function(){
-	var socket = io.connect('http://192.168.1.5:8080');
+	var socket = io.connect('https://tienlen.herokuapp.com/');
 	socket.on('create_table', function(data){
 		//alert(data);
-		$('p').text('Data from Server: ' + data);
+		$('p').text('Data from Server: ' + data.player_id);
 	})
 
 	$('#go').click(function(){
