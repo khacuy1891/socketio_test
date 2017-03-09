@@ -1,4 +1,5 @@
 var http = require('http');
+var app = require('express')();
 var	socketIO = require('socket.io');
 var	port = process.env.PORT || 8080;
 //var	ip = process.env.IP || '192.168.1.5';
@@ -8,9 +9,17 @@ server = http.createServer().listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }),
 
+app.get('/chat', function(req, res){
+  res.sendfile('index.html');
+});
+
 /* server = http.createServer().listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }), */
+
+app.get('/', function(req, res){
+  res.sendfile('index.html');
+});
 
 io = socketIO.listen(server);
 io.set('match origin protocol', true);
@@ -33,6 +42,7 @@ var run = function(socket){
 		// Send data to client
 		console.log('client_sent: ' + data);
 		socket.broadcast.emit('server_sent', data);
+		socket.emit('server_sent', data);
 	})
 	
 	// Receive data from client
