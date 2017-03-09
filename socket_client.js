@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	var socket = io.connect('https://tienlen.herokuapp.com:8080/');
+	var socket = io.connect('http://192.168.1.7:8080/');
 	
 	socket.on('create_table', function(data){
 		//alert(data);
@@ -13,7 +13,7 @@ $(document).ready(function(){
 
 	$('#go').click(function(){
 		socket.emit('client_sent', $('#name').val());
-		socket.emit('create_table', "{\"player_id\":\"web\"}");
+		//socket.emit('create_table', "{\"player_id\":\"web\"}");
 	})
 })
 	

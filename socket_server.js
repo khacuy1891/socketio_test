@@ -42,7 +42,7 @@ var run = function(socket){
 		// Send data to client
 		console.log('client_sent: ' + data);
 		socket.broadcast.emit('server_sent', data);
-		socket.emit('server_sent', data);
+		//socket.emit('server_sent', data);
 	})
 	
 	// Receive data from client
