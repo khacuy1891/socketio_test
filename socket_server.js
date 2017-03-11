@@ -1,33 +1,34 @@
 var http = require('http');
-var app = require('express')();
+var express = require('express');
+var app = express();
 var	socketIO = require('socket.io');
 var	port = process.env.PORT || 8080;
 //var	ip = process.env.IP || '192.168.1.5';
-var count_client = 0;
 
-server = http.createServer().listen(port, function(){
+server = http.createServer(app).listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }),
 
-app.get('/chat', function(req, res){
-  res.sendfile('index.html');
+app.get('/index', function(req, res){
+	res.send("<font color=red>HELLO WORLD</font>");
+	//res.sendFile(__dirname + '/index.html');
 });
 
 /* server = http.createServer().listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }), */
 
-app.get('/', function(req, res){
-  res.sendfile('index.html');
-});
-
 io = socketIO.listen(server);
 io.set('match origin protocol', true);
 io.set('origins', '*:*');
+
+var count_client = 0;
 	
 var run = function(socket){
 	count_client++;
 	console.log('%s. Client %s connected to server!', count_client, socket.id);
+	
+	socket.emit('connected', "Connected successfuly to " + socket.handshake.address);
 	
 	// Receive data from client
 	socket.on('create_table', function(data){
