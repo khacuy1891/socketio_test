@@ -9,8 +9,8 @@ server = http.createServer(app).listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }),
 
-app.get('/index', function(req, res){
-	res.send("<font color=red>HELLO WORLD</font>");
+app.get('/', function(req, res){
+	res.send("<font color=red>NGUYEN KHAC UY</font>");
 	//res.sendFile(__dirname + '/index.html');
 });
 
