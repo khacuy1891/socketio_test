@@ -14,6 +14,11 @@ app.get('/', function(req, res){
 	//res.sendFile(__dirname + '/index.html');
 });
 
+app.get('socket.io/1/?EIO=2&transport=polling&b64=true', function(req, res){
+	res.send('97:0{"sid":"kGOyxESR2SyIgD_AAEIH","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":60000}');
+	//res.sendFile(__dirname + '/index.html');
+});
+
 /* server = http.createServer().listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }), */
