@@ -14,9 +14,14 @@ app.get('/client', function(req, res){
 	res.sendFile(__dirname + '/client.html');
 });
 
+app.get('/', function(req, res){
+	//res.send("<font color=red>NGUYEN KHAC UY</font>");
+	res.sendFile(__dirname + '/index.html');
+});
+
 app.get('socket.io/1/?EIO=2&transport=polling&b64=true', function(req, res){
 	//res.send('97:0{"sid":"kGOyxESR2SyIgD_AAEIH","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":60000}');
-	//res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/index.html');
 });
 
 /* server = http.createServer().listen(port, function(){
