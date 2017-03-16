@@ -9,13 +9,13 @@ server = http.createServer(app).listen(port, function(){
 	console.log('Socket.IO server started at: %s!', port);
 }),
 
-app.get('/', function(req, res){
-	res.send("<font color=red>NGUYEN KHAC UY</font>");
-	//res.sendFile(__dirname + '/index.html');
+app.get('/client', function(req, res){
+	//res.send("<font color=red>NGUYEN KHAC UY</font>");
+	res.sendFile(__dirname + '/client.html');
 });
 
 app.get('socket.io/1/?EIO=2&transport=polling&b64=true', function(req, res){
-	res.send('97:0{"sid":"kGOyxESR2SyIgD_AAEIH","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":60000}');
+	//res.send('97:0{"sid":"kGOyxESR2SyIgD_AAEIH","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":60000}');
 	//res.sendFile(__dirname + '/index.html');
 });
 
@@ -33,7 +33,7 @@ var run = function(socket){
 	count_client++;
 	console.log('%s. Client %s connected to server!', count_client, socket.id);
 	
-	socket.emit('connected', "Connected successfuly to " + socket.handshake.address);
+	socket.emit('connected', "Connected successfuly to %s:%s", socket.handshake.address, port);
 	
 	// Receive data from client
 	socket.on('create_table', function(data){
