@@ -19,7 +19,7 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
-app.get('socket.io/1/?EIO=2&transport=polling&b64=true', function(req, res){
+app.get('/socket.io/1/?EIO=2&transport=polling&b64=true', function(req, res){
 	//res.send('97:0{"sid":"kGOyxESR2SyIgD_AAEIH","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":60000}');
 	res.sendFile(__dirname + '/index.html');
 });
@@ -33,22 +33,125 @@ io.set('match origin protocol', true);
 io.set('origins', '*:*');
 
 var count_client = 0;
+
+var list_player_id = [];
+var list_room_id = [];
+
+function get_miss_room_id() {
+	var room_id = 0;
+	var number_room = list_room_id.length;
+	for (room_id = 0; room_id < number_room; room_id++) {
+		var i = 0;
+		for (i = 0; i < number_room; i++) {
+			if(room_id == list_room_id[i]) {
+				break;
+			}
+		}
+
+		if( i == number_room) {
+			break;
+		}
+	}
+
+	return room_id;
+}
+
+function show_list_room_id() {
+	var str = '';
+	for (i = 0; i < list_room_id.length; i++) {
+		str += list_room_id[i].toString() + '  ';
+	}
+	console.log("room_id: " + str);
+}
+
+function array_to_string(array) {
+	var str = '';
+	for (i = 0; i < array.length; i++) {
+		str += array[i].toString() + '  ';
+	}
+
+	return str;
+}
 	
 var run = function(socket){
+	var m_playerId = -1;
+	var m_roomId = -1;
+
 	count_client++;
 	console.log('%s. Client %s connected to server!', count_client, socket.id);
 	
-	socket.emit('connected', "Connected successfuly to %s:%s", socket.handshake.address, port);
+	socket.emit('connected', "Connected successfuly to: " + socket.handshake.address +  ":" + port);
+
+	//***********************************************************************
+	//disconnect
+	socket.on('disconnect', function () {
+		console.log('%s disconnected...', m_playerId);
+      	count_client--;
+
+      	var number_room = list_room_id.length;
+		for (var i = 0; i < number_room; i++) {
+			if(list_player_id[i] == m_playerId) {
+				list_player_id.splice(i, 1);
+				list_room_id.splice(i, 1);
+			}
+		}
+
+		console.log('room_id: ' + array_to_string(list_room_id));
+		console.log('player_id: ' + array_to_string(list_player_id));
+
+		socket.emit('disconnected');
+  	});
 	
+	//***********************************************************************
 	// Receive data from client
-	socket.on('create_table', function(data){
-		console.log('create_table: ' + data);
-		//var table_id = Math.floor((Math.random() * 10) + 1);
-		// Send data to client
-		socket.emit('create_table', JSON.parse(data));
-		socket.broadcast.emit('create_table', JSON.parse(data));
+	socket.on('create_room', function(data){
+		console.log('create_room: ' + data);
+		var dataJson = JSON.parse(data);
+
+		m_playerId = dataJson.player_id;
+		m_roomId = get_miss_room_id();
+
+		list_player_id.push(m_playerId);
+		list_room_id.push(m_roomId);
+
+		console.log('room_id: ' + array_to_string(list_room_id));
+		console.log('player_id: ' + array_to_string(list_player_id));
+
+		var json = {
+			"player_id" : m_playerId,
+			"room_id" : m_roomId
+		};
+
+		console.log('json: ' + JSON.stringify(json));
+		socket.emit('create_room', json);
+	})
+
+	//***********************************************************************
+	socket.on('leave_room', function(data){
+		console.log('leave_room: ' + data);
+		
+		var dataJson = JSON.parse(data);
+		var player_id = dataJson.player_id;
+		var room_id = dataJson.room_id;
+		console.log( 'Player : (' + player_id + ', ' + room_id + ') has left' );
+
+		if(player_id == m_playerId && room_id == m_roomId) {
+			number_room = list_room_id.length;
+			for (var i = 0; i < number_room; i++) {
+				if(list_player_id[i] == m_playerId) {
+					list_player_id.splice(i, 1);
+					list_room_id.splice(i, 1);
+				}
+			}
+		}
+
+		console.log('room_id: ' + array_to_string(list_room_id));
+		console.log('player_id: ' + array_to_string(list_player_id));
+		
+		//socket.broadcast.emit('create_room', JSON.stringify(msg));
 	})
 	
+	//***********************************************************************
 	// Receive data from client
 	socket.on('client_sent', function(data){
 		// Send data to client
