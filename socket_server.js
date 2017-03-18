@@ -80,7 +80,7 @@ var run = function(socket){
 	count_client++;
 	console.log('%s. Client %s connected to server!', count_client, socket.id);
 	
-	socket.emit('connected', "Connected successfuly to: " + socket.handshake.address +  ":" + port);
+	socket.emit('connected', 'Connected successfuly to: ' + socket.handshake.address + ':' + port);
 
 	//***********************************************************************
 	//disconnect
