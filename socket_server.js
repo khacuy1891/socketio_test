@@ -34,16 +34,17 @@ io.set('origins', '*:*');
 
 var count_client = 0;
 
-var list_player_id = [];
+var list_room = [];
 var list_room_id = [];
 
 function get_miss_room_id() {
 	var room_id = 0;
-	var number_room = list_room_id.length;
+	var number_room = list_room.length;
 	for (room_id = 0; room_id < number_room; room_id++) {
 		var i = 0;
 		for (i = 0; i < number_room; i++) {
-			if(room_id == list_room_id[i]) {
+			var room_id_arr = list_room[i];
+			if(room_id == room_id_arr[0]) {
 				break;
 			}
 		}
@@ -56,21 +57,59 @@ function get_miss_room_id() {
 	return room_id;
 }
 
-function show_list_room_id() {
-	var str = '';
-	for (i = 0; i < list_room_id.length; i++) {
-		str += list_room_id[i].toString() + '  ';
-	}
-	console.log("room_id: " + str);
-}
-
 function array_to_string(array) {
 	var str = '';
-	for (i = 0; i < array.length; i++) {
+	for (i = 1; i < array.length - 2; i++) {
 		str += array[i].toString() + '  ';
+	}
+	if(i = array.length - 1) {
+		str += array[i].toString();
 	}
 
 	return str;
+}
+
+function show_list_room() {
+	console.log(list_room);
+}
+
+function remove_player_id_in_room(room_id, player_id) {
+	var number_room = list_room.length;
+	for (var i = 0; i < number_room; i++) {
+		var room_id_arr = list_room[i];
+		if(room_id_arr[0] == room_id) {
+			for (var j = 1; j < room_id_arr.length; j++) {
+				if(player_id == room_id_arr[j]) {
+					room_id_arr.splice(j, 1);
+					if(room_id_arr.length < 2) {
+						list_room.splice(i, 1);
+					}
+					return 1;
+				}
+				
+			}
+		}
+	}
+
+	return 0;
+}
+
+function add_player_id_in_room(room_id, player_id) {
+	var number_room = list_room.length;
+	for (var i = 0; i < number_room; i++) {
+		var room_id_arr = list_room[i];
+		if(room_id_arr[0] == room_id) {
+			if(room_id_arr.length < 5) {
+				room_id_arr.push(player_id);
+				return 1;
+			}
+			else {
+				return 0;
+			}
+			
+		}
+	}
+	return -1;
 }
 	
 var run = function(socket){
@@ -82,40 +121,49 @@ var run = function(socket){
 	
 	socket.emit('connected', 'Connected successfuly to: ' + socket.handshake.address + ':' + port);
 
+	function get_list_room_id() {
+		list_room_id.splice(0, list_room_id.length);
+		for (var i = 0; i < list_room.length; i++) {
+			list_room_id.push(list_room[i][0]);
+		}
+
+		socket.emit('list_room', list_room_id);
+		socket.broadcast.emit('list_room', list_room_id);
+	}
+
+	 get_list_room_id();
+
 	//***********************************************************************
 	//disconnect
 	socket.on('disconnect', function () {
 		console.log('%s disconnected...', m_playerId);
       	count_client--;
 
-      	var number_room = list_room_id.length;
-		for (var i = 0; i < number_room; i++) {
-			if(list_player_id[i] == m_playerId) {
-				list_player_id.splice(i, 1);
-				list_room_id.splice(i, 1);
-			}
+      	if(m_roomId >= 0) {
+			remove_player_id_in_room(m_roomId, m_playerId);
+			show_list_room();
 		}
-
-		console.log('room_id: ' + array_to_string(list_room_id));
-		console.log('player_id: ' + array_to_string(list_player_id));
 
 		socket.emit('disconnected');
   	});
 	
 	//***********************************************************************
 	// Receive data from client
-	socket.on('create_room', function(data){
+	socket.on('create_room', function(data) {
+		console.log('***********************************************************************');
 		console.log('create_room: ' + data);
 		var dataJson = JSON.parse(data);
 
 		m_playerId = dataJson.player_id;
 		m_roomId = get_miss_room_id();
+		console.log('room_id: ' + m_roomId);
 
-		list_player_id.push(m_playerId);
-		list_room_id.push(m_roomId);
+		var room_id_arr = [];
+		room_id_arr.push(m_roomId);
+		room_id_arr.push(m_playerId);
 
-		console.log('room_id: ' + array_to_string(list_room_id));
-		console.log('player_id: ' + array_to_string(list_player_id));
+		list_room.push(room_id_arr);
+		show_list_room();
 
 		var json = {
 			"player_id" : m_playerId,
@@ -123,7 +171,38 @@ var run = function(socket){
 		};
 
 		console.log('json: ' + JSON.stringify(json));
+		console.log('***********************************************************************');
 		socket.emit('create_room', json);
+		get_list_room_id();
+	})
+
+	//***********************************************************************
+	// Receive data from client
+	socket.on('join_room', function(data) {
+		console.log('***********************************************************************');
+		console.log('join_room: ' + data);
+		var dataJson = JSON.parse(data);
+
+		if(m_playerId < 0) {
+			m_playerId = dataJson.player_id;
+		}
+
+		var result = 0;
+		if(m_roomId < 0 ) {
+			m_roomId = dataJson.room_id;
+			result = add_player_id_in_room(m_roomId, m_playerId);
+			show_list_room();
+		}
+
+		var json = {
+			"player_id" : m_playerId,
+			"room_id" : m_roomId,
+			"result" : result
+		};
+
+		console.log('json: ' + JSON.stringify(json));
+		console.log('***********************************************************************');
+		socket.emit('join_room', json);
 	})
 
 	//***********************************************************************
@@ -131,22 +210,21 @@ var run = function(socket){
 		console.log('leave_room: ' + data);
 		
 		var dataJson = JSON.parse(data);
-		var player_id = dataJson.player_id;
-		var room_id = dataJson.room_id;
-		console.log( 'Player : (' + player_id + ', ' + room_id + ') has left' );
-
-		if(player_id == m_playerId && room_id == m_roomId) {
-			number_room = list_room_id.length;
-			for (var i = 0; i < number_room; i++) {
-				if(list_player_id[i] == m_playerId) {
-					list_player_id.splice(i, 1);
-					list_room_id.splice(i, 1);
-				}
-			}
+		if(m_playerId < 0) {
+			m_playerId = dataJson.player_id;
 		}
+		if(m_roomId < 0 ) {
+			m_roomId = dataJson.room_id;
+		}
+		console.log( 'Player : (' + m_playerId + ', ' + m_roomId + ') has left' );
 
-		console.log('room_id: ' + array_to_string(list_room_id));
-		console.log('player_id: ' + array_to_string(list_player_id));
+		var result = remove_player_id_in_room(m_roomId, m_playerId);
+		if (result == 1) {
+			m_roomId = -1;
+		}		
+
+		show_list_room();
+		get_list_room_id();
 		
 		//socket.broadcast.emit('create_room', JSON.stringify(msg));
 	})

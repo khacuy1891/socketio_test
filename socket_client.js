@@ -1,6 +1,6 @@
 $(document).ready(function(){
-	//var socket = io.connect('http://127.0.0.1:8080/');
-	var socket = io.connect('http://tienlen.herokuapp.com');
+	var socket = io.connect('http://127.0.0.1:8080/');
+	//var socket = io.connect('http://tienlen.herokuapp.com');
 
 	var m_playerId = Math.floor((Math.random() * 100) + 1);
 	var m_roomId = -1;
@@ -9,14 +9,16 @@ $(document).ready(function(){
 		if(m_roomId < 0) {
 			$('#create_room').attr("disabled", false);
 			$('#leave_room').attr("disabled", true);
+			$('#join').attr("disabled", false);
 		}
 		else {
 			$('#create_room').attr("disabled", true);
 			$('#leave_room').attr("disabled", false);
+			$('#join').attr("disabled", true);
 		}
 	}
 
-	checkCreatedRoom();;
+	checkCreatedRoom();
 
 	socket.on('connected', function(data){
 		$('#hw1').text(data);
@@ -34,14 +36,38 @@ $(document).ready(function(){
 		//alert(data);
 		$('#hw1').text(data.player_id);
 	})
+
+	socket.on('join_room', function(data){
+		//alert(data);
+		var msg = 'Cannot join this room!';
+		if(data.result == 0) {
+			msg = 'Room full';
+		}
+		else if(data.result == 1) {
+			msg = 'Join successfuly!';
+			m_roomId = data.room_id;
+			$('#hw2').text('room_id: ' + m_roomId);
+		}
+
+		$('#hw1').text(msg);
+		checkCreatedRoom();
+	})
 	
 	socket.on('create_room', function(data){
 		//alert(data);
 		console.log(data);
 		m_roomId = data.room_id;
 		if(m_roomId >= 0) {
-			checkCreatedRoom();
 			$('#hw2').text('room_id: ' + m_roomId);
+		}
+		checkCreatedRoom();
+	})
+
+	socket.on('list_room', function(data){
+		console.log(data);
+		$("#select_room option[value='room_id']").remove();
+		for (var i = 0; i < data.length; i++) {
+			$("#select_room").append(new Option(data[i].toString(), "room_id"));
 		}
 	})
 
@@ -63,12 +89,17 @@ $(document).ready(function(){
 		}
 	})
 
-	$('#go').click(function(){
-		//socket.emit('client_sent', $('#name').val());
-		//socket.emit('create_room', "{\"player_id\":\"10\"}");
-		list_room_id['%s', m_playerId] = Math.floor((Math.random() * 100) + 1);
-		m_playerId ++;
-		console.log(list_room_id);
+	$('#join').click(function(){
+		var room_id = $('#select_room option:selected').text();
+
+		if(room_id >= 0) {
+			var json = {
+				"player_id" : m_playerId,
+				"room_id" : room_id
+			};
+			checkCreatedRoom();
+			socket.emit('join_room', JSON.stringify(json));
+		}
 	})
 })
 	
