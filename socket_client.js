@@ -5,6 +5,8 @@ $(document).ready(function(){
 	var m_playerId = Math.floor((Math.random() * 100) + 1);
 	var m_roomId = -1;
 
+	var m_isJoining = false;
+
 	function checkCreatedRoom() {
 		if(m_roomId < 0) {
 			$('#create_room').attr("disabled", false);
@@ -29,7 +31,7 @@ $(document).ready(function(){
 		$('#hw1').text(data);
 		checkCreatedRoom();
 
-		m_roomId = -1;
+		//m_roomId = -1;
 	})
 
 	socket.on('server_sent', function(data){
@@ -39,13 +41,17 @@ $(document).ready(function(){
 
 	socket.on('join_room', function(data){
 		//alert(data);
+		if(m_isJoining == true && m_roomId < 0) {
+			m_roomId = data.room_id;
+		}
+		
+		m_isJoining = false;
 		var msg = 'Cannot join this room!';
 		if(data.result == 0) {
-			msg = 'Room full';
+			msg = 'Room ' + data.room_id + ' full';
 		}
 		else if(data.result == 1) {
-			msg = 'Join successfuly!';
-			m_roomId = data.room_id;
+			msg = data.player_id + ' join ' + data.room_id + ' successfuly!';
 			$('#hw2').text('room_id: ' + m_roomId);
 		}
 
@@ -90,8 +96,9 @@ $(document).ready(function(){
 	})
 
 	$('#join').click(function(){
-		var room_id = $('#select_room option:selected').text();
-
+		var room_id_str = $('#select_room option:selected').text();
+		var room_id = parseInt(room_id_str);
+		m_isJoining = true;
 		if(room_id >= 0) {
 			var json = {
 				"player_id" : m_playerId,

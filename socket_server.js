@@ -34,17 +34,16 @@ io.set('origins', '*:*');
 
 var count_client = 0;
 
-var list_room = [];
-var list_room_id = [];
+var m_room_array = [];
+var m_room_id_array = [];
 
 function get_miss_room_id() {
 	var room_id = 0;
-	var number_room = list_room.length;
+	var number_room = m_room_id_array.length;
 	for (room_id = 0; room_id < number_room; room_id++) {
 		var i = 0;
 		for (i = 0; i < number_room; i++) {
-			var room_id_arr = list_room[i];
-			if(room_id == room_id_arr[0]) {
+			if(room_id == m_room_id_array[0]) {
 				break;
 			}
 		}
@@ -70,24 +69,29 @@ function array_to_string(array) {
 }
 
 function show_list_room() {
-	console.log(list_room);
+	console.log(m_room_id_array);
+	console.log(m_room_array);
 }
 
 function remove_player_id_in_room(room_id, player_id) {
-	var number_room = list_room.length;
+	var number_room = m_room_id_array.length;
 	for (var i = 0; i < number_room; i++) {
-		var room_id_arr = list_room[i];
-		if(room_id_arr[0] == room_id) {
-			for (var j = 1; j < room_id_arr.length; j++) {
-				if(player_id == room_id_arr[j]) {
-					room_id_arr.splice(j, 1);
-					if(room_id_arr.length < 2) {
-						list_room.splice(i, 1);
-					}
-					return 1;
-				}
-				
+		if(m_room_id_array[i] == room_id) {
+			var room = m_room_array[i];
+			if ( room.length == 1 ) {
+				m_room_id_array.splice(i, 1);
+				m_room_array.splice(i, 1);
 			}
+			else {
+				for (var j = 0; j < 4; j++) {
+					if( player_id == room[j] ) {
+						room.splice(j, 1);
+						return 1;
+					}
+					
+				}
+			}
+			
 		}
 	}
 
@@ -95,12 +99,12 @@ function remove_player_id_in_room(room_id, player_id) {
 }
 
 function add_player_id_in_room(room_id, player_id) {
-	var number_room = list_room.length;
+	var number_room = m_room_id_array.length;
 	for (var i = 0; i < number_room; i++) {
-		var room_id_arr = list_room[i];
-		if(room_id_arr[0] == room_id) {
-			if(room_id_arr.length < 5) {
-				room_id_arr.push(player_id);
+		if(m_room_id_array[i] == room_id) {
+			var room = m_room_array[i];
+			if(room.length < 4) {
+				room.push(player_id);
 				return 1;
 			}
 			else {
@@ -122,13 +126,13 @@ var run = function(socket){
 	socket.emit('connected', 'Connected successfuly to: ' + socket.handshake.address + ':' + port);
 
 	function get_list_room_id() {
-		list_room_id.splice(0, list_room_id.length);
-		for (var i = 0; i < list_room.length; i++) {
-			list_room_id.push(list_room[i][0]);
-		}
+		// list_room_id.splice(0, list_room_id.length);
+		// for (var i = 0; i < list_room.length; i++) {
+		// 	list_room_id.push(list_room[i][0]);
+		// }
 
-		socket.emit('list_room', list_room_id);
-		socket.broadcast.emit('list_room', list_room_id);
+		socket.emit('list_room', m_room_id_array);
+		socket.broadcast.emit('list_room', m_room_id_array);
 	}
 
 	 get_list_room_id();
@@ -139,10 +143,10 @@ var run = function(socket){
 		console.log('%s disconnected...', m_playerId);
       	count_client--;
 
-      	if(m_roomId >= 0) {
-			remove_player_id_in_room(m_roomId, m_playerId);
-			show_list_room();
-		}
+      	// if(m_roomId >= 0) {
+      	// 	remove_player_id_in_room(m_roomId, m_playerId);
+      	// 	show_list_room();
+      	// }
 
 		socket.emit('disconnected');
   	});
@@ -158,11 +162,11 @@ var run = function(socket){
 		m_roomId = get_miss_room_id();
 		console.log('room_id: ' + m_roomId);
 
-		var room_id_arr = [];
-		room_id_arr.push(m_roomId);
-		room_id_arr.push(m_playerId);
+		var room = [];
+		m_room_id_array.push(m_roomId);
+		room.push(m_playerId);
 
-		list_room.push(room_id_arr);
+		m_room_array.push(room);
 		show_list_room();
 
 		var json = {
@@ -203,6 +207,7 @@ var run = function(socket){
 		console.log('json: ' + JSON.stringify(json));
 		console.log('***********************************************************************');
 		socket.emit('join_room', json);
+		socket.broadcast.emit('join_room', json);
 	})
 
 	//***********************************************************************
@@ -234,8 +239,8 @@ var run = function(socket){
 	socket.on('client_sent', function(data){
 		// Send data to client
 		console.log('client_sent: ' + data);
-		socket.broadcast.emit('server_sent', data);
 		socket.emit('server_sent', data);
+		socket.broadcast.emit('server_sent', data);
 	})
 	
 	// Receive data from client
