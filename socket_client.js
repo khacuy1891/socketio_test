@@ -23,6 +23,7 @@ $(document).ready(function(){
 	checkCreatedRoom();
 
 	socket.on('connected', function(data){
+		console.log('connected');
 		$('#hw1').text(data);
 		checkCreatedRoom();
 	})
@@ -67,6 +68,12 @@ $(document).ready(function(){
 			$('#hw2').text(JSON.stringify(data));
 		}
 		checkCreatedRoom();
+	})
+
+	socket.on('chia_bai', function(data){
+		//alert(data);
+		console.log(data);
+		$('#hw1').text(data);
 	})
 
 	socket.on('list_room', function(data){

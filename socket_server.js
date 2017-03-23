@@ -41,6 +41,7 @@ var run = function(socket){
 	var m_playerId = -1;
 	var m_roomId = -1;
 	var m_index = -1;
+	var my_list_card;
 
 /********************** FUNCTION BEGIN ***********************/
 	function get_miss_room_id() {
@@ -268,41 +269,50 @@ var run = function(socket){
 
 		console.log('chia_bai: ' + room);
 
-		var list_card = [];
+		var list_all_card = [];
+		my_list_card = new Array;
 		var list_card_1 = [];
 		var list_card_2 = [];
 		var list_card_3 = [];
-		var list_card_4 = [];
 
 		for (var i = 0; i < 52; i++) {
-			list_card.push(i);
+			list_all_card.push(i);
 		}
 
 		for (var i = 0; i < 52; i++) {
-			if(i < room.length) {
-				var size_card = list_card.length;
-				var index = Math.floor((Math.random() * size_card));
-				var card_id = list_card[index];
-				list_card.pop();
 
-				if((i % 4) == 0) {
+			var turn_player = i % 4;
+			if(turn_player < room.length) {
+				var size_card = list_all_card.length;
+				var index = Math.floor((Math.random() * size_card));
+				var card_id = list_all_card[index];
+				list_all_card.pop();
+
+				if(turn_player == 0) {
+					console.log('list_card_1 push: ' + card_id);
+					my_list_card.push(card_id);
+				}
+				else if(turn_player == 1) {
+					console.log('list_card_2 push: ' + card_id);
 					list_card_1.push(card_id);
 				}
-				else if((i % 4) == 1) {
+				else if(turn_player == 2) {
+					console.log('list_card_3 push: ' + card_id);
 					list_card_2.push(card_id);
 				}
-				else if((i % 4) == 2) {
+				else if(turn_player == 3) {
+					console.log('list_card_4 push: ' + card_id);
 					list_card_3.push(card_id);
-				}
-				else if((i % 4) == 3) {
-					list_card_4.push(card_id);
 				}
 			}
 			
 		}
 
-		console.log('chia_bai: ' + list_card_1);
-		socket.emit('chia_bai', JSON.parse(list_card_1));
+		console.log('me: ' + JSON.stringify(my_list_card));
+		console.log('player_1: ' + JSON.stringify(list_card_1));
+		console.log('player_2: ' + JSON.stringify(list_card_2));
+		console.log('player_3: ' + JSON.stringify(list_card_3));
+		socket.emit('chia_bai', my_list_card);
 	})
 }
 
