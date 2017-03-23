@@ -52,7 +52,7 @@ $(document).ready(function(){
 		}
 		else if(data.result == 1) {
 			msg = data.player_id + ' join ' + data.room_id + ' successfuly!';
-			$('#hw2').text('room_id: ' + m_roomId);
+			$('#hw2').text(JSON.stringify(data));
 		}
 
 		$('#hw1').text(msg);
@@ -64,7 +64,7 @@ $(document).ready(function(){
 		console.log(data);
 		m_roomId = data.room_id;
 		if(m_roomId >= 0) {
-			$('#hw2').text('room_id: ' + m_roomId);
+			$('#hw2').text(JSON.stringify(data));
 		}
 		checkCreatedRoom();
 	})
@@ -78,7 +78,7 @@ $(document).ready(function(){
 	})
 
 	$('#create_room').click(function(){
-		$('#hw1').text('player_id: ' + m_playerId);
+		//$('#hw1').text('player_id: ' + m_playerId);
 		socket.emit('create_room', '{"player_id" : ' + m_playerId + '}');
 	})
 
@@ -107,6 +107,10 @@ $(document).ready(function(){
 			checkCreatedRoom();
 			socket.emit('join_room', JSON.stringify(json));
 		}
+	})
+
+	$('#chia_bai').click(function(){
+		socket.emit('chia_bai', '');
 	})
 })
 	

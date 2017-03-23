@@ -13,14 +13,14 @@ from optparse import OptionParser
 current_dir = os.path.dirname(os.path.realpath(__file__))
 print '==================================================='
 command = 'git add .'
-print command
+print '===========' + command
 os.system(command)
 
 command = 'git commit -m "Update"'
-print command
+print '===========' + command
 os.system(command)
 
 command = 'git push origin master'
-print command
+print '===========' + command
 os.system(command)
 

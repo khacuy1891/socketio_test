@@ -36,89 +36,95 @@ var count_client = 0;
 
 var m_room_array = [];
 var m_room_id_array = [];
-
-function get_miss_room_id() {
-	var room_id = 0;
-	var number_room = m_room_id_array.length;
-	for (room_id = 0; room_id < number_room; room_id++) {
-		var i = 0;
-		for (i = 0; i < number_room; i++) {
-			if(room_id == m_room_id_array[0]) {
-				break;
-			}
-		}
-
-		if( i == number_room) {
-			break;
-		}
-	}
-
-	return room_id;
-}
-
-function array_to_string(array) {
-	var str = '';
-	for (i = 1; i < array.length - 2; i++) {
-		str += array[i].toString() + '  ';
-	}
-	if(i = array.length - 1) {
-		str += array[i].toString();
-	}
-
-	return str;
-}
-
-function show_list_room() {
-	console.log(m_room_id_array);
-	console.log(m_room_array);
-}
-
-function remove_player_id_in_room(room_id, player_id) {
-	var number_room = m_room_id_array.length;
-	for (var i = 0; i < number_room; i++) {
-		if(m_room_id_array[i] == room_id) {
-			var room = m_room_array[i];
-			if ( room.length == 1 ) {
-				m_room_id_array.splice(i, 1);
-				m_room_array.splice(i, 1);
-			}
-			else {
-				for (var j = 0; j < 4; j++) {
-					if( player_id == room[j] ) {
-						room.splice(j, 1);
-						return 1;
-					}
-					
-				}
-			}
-			
-		}
-	}
-
-	return 0;
-}
-
-function add_player_id_in_room(room_id, player_id) {
-	var number_room = m_room_id_array.length;
-	for (var i = 0; i < number_room; i++) {
-		if(m_room_id_array[i] == room_id) {
-			var room = m_room_array[i];
-			if(room.length < 4) {
-				room.push(player_id);
-				return 1;
-			}
-			else {
-				return 0;
-			}
-			
-		}
-	}
-	return -1;
-}
 	
 var run = function(socket){
 	var m_playerId = -1;
 	var m_roomId = -1;
+	var m_index = -1;
+
+/********************** FUNCTION BEGIN ***********************/
+	function get_miss_room_id() {
+		var room_id = 0;
+		var number_room = m_room_id_array.length;
+		for (room_id = 0; room_id < number_room; room_id++) {
+			var i = 0;
+			for (i = 0; i < number_room; i++) {
+				if(room_id == m_room_id_array[0]) {
+					break;
+				}
+			}
+
+			if( i == number_room) {
+				break;
+			}
+		}
+
+		return room_id;
+	}
+
+	function array_to_string(array) {
+		var str = '';
+		for (i = 1; i < array.length - 2; i++) {
+			str += array[i].toString() + '  ';
+		}
+		if(i = array.length - 1) {
+			str += array[i].toString();
+		}
+
+		return str;
+	}
+
+	function show_list_room() {
+		console.log(m_room_id_array);
+		console.log(m_room_array);
+	}
+
+	function remove_player_id_in_room(room_id, player_id) {
+		var number_room = m_room_id_array.length;
+		for (var i = 0; i < number_room; i++) {
+			if(m_room_id_array[i] == room_id) {
+				var room = m_room_array[i];
+				if ( room.length == 1 ) {
+					m_room_id_array.splice(i, 1);
+					m_room_array.splice(i, 1);
+					m_index = -1;
+				}
+				else {
+					for (var j = 0; j < 4; j++) {
+						if( player_id == room[j] ) {
+							room.splice(j, 1);
+							m_index = -1;
+							return 1;
+						}
+						
+					}
+				}
+				
+			}
+		}
+
+		return 0;
+	}
+
+	function add_player_id_in_room(room_id, player_id) {
+		var number_room = m_room_id_array.length;
+		for (var i = 0; i < number_room; i++) {
+			if(m_room_id_array[i] == room_id) {
+				m_index = i;
+				var room = m_room_array[i];
+				if(room.length < 4) {
+					room.push(player_id);
+					return 1;
+				}
+				else {
+					return 0;
+				}
+				
+			}
+		}
+		return -1;
+	}
+/********************** FUNCTION END ***********************/
 
 	count_client++;
 	console.log('%s. Client %s connected to server!', count_client, socket.id);
@@ -163,6 +169,7 @@ var run = function(socket){
 		console.log('room_id: ' + m_roomId);
 
 		var room = [];
+		m_index = m_room_id_array.length;
 		m_room_id_array.push(m_roomId);
 		room.push(m_playerId);
 
@@ -250,6 +257,52 @@ var run = function(socket){
 		console.log('Data from client: ', data);
 		// Send data to client
 		socket.broadcast.emit('hello-user', data);
+	})
+
+	//***********************************************************************
+	// Receive data from client
+	socket.on('chia_bai', function(data) {
+		console.log('***********************************************************************');
+
+		var room = m_room_array[m_index];
+
+		console.log('chia_bai: ' + room);
+
+		var list_card = [];
+		var list_card_1 = [];
+		var list_card_2 = [];
+		var list_card_3 = [];
+		var list_card_4 = [];
+
+		for (var i = 0; i < 52; i++) {
+			list_card.push(i);
+		}
+
+		for (var i = 0; i < 52; i++) {
+			if(i < room.length) {
+				var size_card = list_card.length;
+				var index = Math.floor((Math.random() * size_card));
+				var card_id = list_card[index];
+				list_card.pop();
+
+				if((i % 4) == 0) {
+					list_card_1.push(card_id);
+				}
+				else if((i % 4) == 1) {
+					list_card_2.push(card_id);
+				}
+				else if((i % 4) == 2) {
+					list_card_3.push(card_id);
+				}
+				else if((i % 4) == 3) {
+					list_card_4.push(card_id);
+				}
+			}
+			
+		}
+
+		console.log('chia_bai: ' + list_card_1);
+		socket.emit('chia_bai', JSON.parse(list_card_1));
 	})
 }
 
