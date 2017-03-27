@@ -37,7 +37,7 @@ $(document).ready(function(){
 
 	socket.on('server_sent', function(data){
 		//alert(data);
-		$('#hw1').text(data.player_id);
+		$('#hw1').text(data);
 	})
 
 	socket.on('join_room', function(data){

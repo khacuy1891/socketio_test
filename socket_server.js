@@ -36,6 +36,20 @@ var count_client = 0;
 
 var m_room_array = [];
 var m_room_id_array = [];
+
+function sort_increase(array) {
+	for (var i = 0; i < array.length - 1; i++) {
+		for (var j = i + 1; j < array.length; j++) {
+			if(array[i] > array[j]) {
+				var temp = array[i];
+				array[i] = array[j];
+				array[j] = temp;
+			}
+		}
+	}
+
+	return array;
+}
 	
 var run = function(socket){
 	var m_playerId = -1;
@@ -282,11 +296,11 @@ var run = function(socket){
 		for (var i = 0; i < 52; i++) {
 
 			var turn_player = i % 4;
-			if(turn_player < room.length) {
+			if(turn_player < 4) {
 				var size_card = list_all_card.length;
 				var index = Math.floor((Math.random() * size_card));
 				var card_id = list_all_card[index];
-				list_all_card.pop();
+				list_all_card.splice(index, 1);
 
 				if(turn_player == 0) {
 					console.log('list_card_1 push: ' + card_id);
@@ -308,10 +322,10 @@ var run = function(socket){
 			
 		}
 
-		console.log('me: ' + JSON.stringify(my_list_card));
-		console.log('player_1: ' + JSON.stringify(list_card_1));
-		console.log('player_2: ' + JSON.stringify(list_card_2));
-		console.log('player_3: ' + JSON.stringify(list_card_3));
+		console.log('me: ' + JSON.stringify(sort_increase(my_list_card)));
+		console.log('player_1: ' + JSON.stringify(sort_increase(list_card_1)));
+		console.log('player_2: ' + JSON.stringify(sort_increase(list_card_2)));
+		console.log('player_3: ' + JSON.stringify(sort_increase(list_card_3)));
 		socket.emit('chia_bai', my_list_card);
 	})
 }
