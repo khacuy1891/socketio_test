@@ -1,6 +1,7 @@
 $(document).ready(function(){
-	var socket = io.connect('http://127.0.0.1:8080/');
-	//var socket = io.connect('http://tienlen.herokuapp.com');
+	console.log('Client starting...');
+	//var socket = io.connect('http://127.0.0.1:8080/');
+	var socket = io.connect('http://tienlen.herokuapp.com');
 
 	var m_playerId = Math.floor((Math.random() * 100) + 1);
 	var m_roomId = -1;
