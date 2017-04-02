@@ -128,6 +128,9 @@ var run = function(socket){
 			if(m_room_id_array[i] == room_id) {
 				m_index = i;
 				var room = m_room_array[i];
+				if(room.indexOf(player_id) >= 0) {
+					return 1;
+				}
 				if(room.length < 4) {
 					room.push(player_id);
 					return 1;
