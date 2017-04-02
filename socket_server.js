@@ -64,7 +64,7 @@ var run = function(socket){
 		for (room_id = 0; room_id < number_room; room_id++) {
 			var i = 0;
 			for (i = 0; i < number_room; i++) {
-				if(room_id == m_room_id_array[0]) {
+				if(room_id == m_room_id_array[i]) {
 					break;
 				}
 			}
@@ -122,6 +122,7 @@ var run = function(socket){
 	}
 
 	function add_player_id_in_room(room_id, player_id) {
+		console.log("add_player_id_in_room: " + m_room_id_array + " " + room_id);
 		var number_room = m_room_id_array.length;
 		for (var i = 0; i < number_room; i++) {
 			if(m_room_id_array[i] == room_id) {
@@ -139,7 +140,8 @@ var run = function(socket){
 		}
 		return -1;
 	}
-/********************** FUNCTION END ***********************/
+
+	/********************** FUNCTION END ***********************/
 
 	count_client++;
 	console.log('%s. Client %s connected to server!', count_client, socket.id);
@@ -213,21 +215,30 @@ var run = function(socket){
 			m_playerId = dataJson.player_id;
 		}
 
-		var result = 0;
+		var room_id = dataJson.room_id;
+
+		var result = -1;
 		if(m_roomId < 0 ) {
-			m_roomId = dataJson.room_id;
-			result = add_player_id_in_room(m_roomId, m_playerId);
+			result = add_player_id_in_room(room_id, m_playerId);
 			show_list_room();
+		}
+
+		var room = m_room_array[m_index];
+		console.log('room: ' + room);
+		if (result == 1) {
+			m_roomId = room_id;
+			socket.emit('player_id_array', room);
 		}
 
 		var json = {
 			"player_id" : m_playerId,
-			"room_id" : m_roomId,
+			"room_id" : room_id,
 			"result" : result
 		};
 
 		console.log('json: ' + JSON.stringify(json));
 		console.log('***********************************************************************');
+		
 		socket.emit('join_room', json);
 		socket.broadcast.emit('join_room', json);
 	})
@@ -327,6 +338,7 @@ var run = function(socket){
 		console.log('player_2: ' + JSON.stringify(sort_increase(list_card_2)));
 		console.log('player_3: ' + JSON.stringify(sort_increase(list_card_3)));
 		socket.emit('chia_bai', my_list_card);
+		socket.broadcast.emit('chia_bai', my_list_card);
 	})
 }
 

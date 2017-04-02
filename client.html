@@ -1,19 +1,20 @@
 <!doctype html>
 <html>
 <head>
-	<script src='http://127.0.0.1:8080/socket.io/socket.io.js'></script>
+	<!--script src='http://127.0.0.1:8080/socket.io/socket.io.js'></script-->
 	<script src='http://code.jquery.com/jquery-1.10.1.min.js'></script>
 	<script src='socket_client.js'></script>
 	<script src='https://tienlen.herokuapp.com/socket.io/socket.io.js'></script>
-	<script src='https://tienlen.herokuapp.com/socket_client.js'></script>
+	<!--script src='https://tienlen.herokuapp.com/socket_client.js'></script-->
 </head>
 <body>
 	<div>
-		<p id='hw1'>Hello world 1!</p>
-		<p id='hw2'>Hello world 2!</p>
+		<p id='text1'>Hello world 1!</p>
+		<p id='text2'>Hello world 2!</p>
+		<p id='text3'>Hello world 3!</p>
 		<button id='create_room'>Create room</button><br>
 		<button id='leave_room'>Leave room</button><br>
-		<input type='number' id='room_id' value=''/>
+		<input type='text' id='room_id' value=''/>
 		<select id="select_room">
 			<option value="None">Please select room</option>
 		</select>

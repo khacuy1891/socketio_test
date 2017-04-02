@@ -1,12 +1,14 @@
 $(document).ready(function(){
 	console.log('Client starting...');
-	//var socket = io.connect('http://127.0.0.1:8080/');
-	var socket = io.connect('http://tienlen.herokuapp.com');
+	var socket = io.connect('http://127.0.0.1:8080/');
+	//var socket = io.connect('http://tienlen.herokuapp.com');
 
 	var m_playerId = Math.floor((Math.random() * 100) + 1);
 	var m_roomId = -1;
 
 	var m_isJoining = false;
+
+	$('#text1').text(m_playerId);
 
 	function checkCreatedRoom() {
 		if(m_roomId < 0) {
@@ -24,13 +26,14 @@ $(document).ready(function(){
 	checkCreatedRoom();
 
 	socket.on('connected', function(data){
+		m_roomId = -1;
 		console.log('connected');
-		$('#hw1').text(data);
+		$('#text2').text(data);
 		checkCreatedRoom();
 	})
 
 	socket.on('disconnect', function(data){
-		$('#hw1').text(data);
+		$('#text2').text(data);
 		checkCreatedRoom();
 
 		//m_roomId = -1;
@@ -38,7 +41,7 @@ $(document).ready(function(){
 
 	socket.on('server_sent', function(data){
 		//alert(data);
-		$('#hw1').text(data);
+		$('#text2').text(data);
 	})
 
 	socket.on('join_room', function(data){
@@ -54,10 +57,10 @@ $(document).ready(function(){
 		}
 		else if(data.result == 1) {
 			msg = data.player_id + ' join ' + data.room_id + ' successfuly!';
-			$('#hw2').text(JSON.stringify(data));
+			$('#text3').text(JSON.stringify(data));
 		}
 
-		$('#hw1').text(msg);
+		$('#text2').text(msg);
 		checkCreatedRoom();
 	})
 	
@@ -66,7 +69,7 @@ $(document).ready(function(){
 		console.log(data);
 		m_roomId = data.room_id;
 		if(m_roomId >= 0) {
-			$('#hw2').text(JSON.stringify(data));
+			$('#text3').text(JSON.stringify(data));
 		}
 		checkCreatedRoom();
 	})
@@ -74,7 +77,7 @@ $(document).ready(function(){
 	socket.on('chia_bai', function(data){
 		//alert(data);
 		console.log(data);
-		$('#hw1').text(data);
+		$('#text2').text(data);
 	})
 
 	socket.on('list_room', function(data){
@@ -86,7 +89,7 @@ $(document).ready(function(){
 	})
 
 	$('#create_room').click(function(){
-		//$('#hw1').text('player_id: ' + m_playerId);
+		//$('#text2').text('player_id: ' + m_playerId);
 		socket.emit('create_room', '{"player_id" : ' + m_playerId + '}');
 	})
 
